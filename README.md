@@ -144,7 +144,8 @@ If `ollama serve` says port `11434` is already in use, Ollama is already running
 
 ## Stress-Test Email Generator
 
-Use the included script to generate synthetic inbox emails for classification testing.
+Use the included script to generate randomized synthetic inbox emails for classification testing.
+Every run produces different subjects/bodies/amounts/dates unless you pass a fixed seed.
 
 ```bash
 python -m scripts.send_stress_test_emails
@@ -155,6 +156,8 @@ Optional overrides:
 ```bash
 python -m scripts.send_stress_test_emails --to-email "you@example.com"
 python -m scripts.send_stress_test_emails --prefix "[AI-STRESS-MYRUN]"
+python -m scripts.send_stress_test_emails --count 25
+python -m scripts.send_stress_test_emails --seed 42
 ```
 
 Recipient selection order:
@@ -162,6 +165,11 @@ Recipient selection order:
 1. `--to-email`
 2. `STRESS_TEST_TO_EMAIL` (env var)
 3. Authenticated Gmail address from `users.getProfile(userId="me")`
+
+Notes:
+
+- Emails are sent from the authenticated Gmail account (`userId="me"`), so stress tests run from the user's side.
+- Default volume is 15 emails per run (configurable with `--count` or `STRESS_TEST_COUNT`).
 
 ## Existing Label Mapping
 
@@ -225,6 +233,7 @@ Runtime:
 - `INCLUDE_READ_INBOX_EMAILS` (`false` by default; set `true` for backfill/testing)
 - `INBOX_SUBJECT_CONTAINS` (optional subject filter; useful with include-read mode)
 - `STRESS_TEST_TO_EMAIL` (optional default recipient for `scripts.send_stress_test_emails`)
+- `STRESS_TEST_COUNT` (optional default number of generated stress emails; default `15`)
 - `CATEGORY_LABELING_ENABLED`
 - `EXCLUDE_ALREADY_LABELED` (set `false` when you intentionally want to reprocess already-labeled emails)
 
