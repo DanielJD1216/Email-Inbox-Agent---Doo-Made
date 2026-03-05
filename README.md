@@ -41,8 +41,12 @@ Each run (`python -m app.main`) does this:
 |- scripts/
 |  |- first_run_windows.ps1
 |  |- run_windows.ps1
+|  |- enable_scheduler_windows.ps1
+|  |- disable_scheduler_windows.ps1
 |  |- first_run_mac.sh
 |  |- run_mac.sh
+|  |- enable_scheduler_mac.sh
+|  |- disable_scheduler_mac.sh
 |  `- send_stress_test_emails.py
 `- app/
    |- __init__.py
@@ -242,23 +246,32 @@ Runtime:
 
 This app is run-per-execution. For always-on behavior, schedule it every few minutes.
 
-### Windows Task Scheduler
+### Windows (Task Scheduler Helper Script)
 
-Use action:
+Enable every 2 minutes:
 
-```text
-Program/script: C:\Windows\System32\cmd.exe
-Arguments: /c cd /d "C:\path\to\repo" && ".\.venv\Scripts\python.exe" -m app.main >> ".\logs\agent.log" 2>&1
+```powershell
+.\scripts\enable_scheduler_windows.ps1 -EveryMinutes 2
 ```
 
-### macOS launchd
+Disable:
 
-Use `StartInterval` (for example 300 seconds) in a LaunchAgent plist and run:
+```powershell
+.\scripts\disable_scheduler_windows.ps1
+```
+
+### macOS (launchd Helper Script)
+
+Enable every 2 minutes:
 
 ```bash
-launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.emailinbox.agent.plist
-launchctl enable gui/$(id -u)/com.emailinbox.agent
-launchctl kickstart -k gui/$(id -u)/com.emailinbox.agent
+bash scripts/enable_scheduler_mac.sh 2
+```
+
+Disable:
+
+```bash
+bash scripts/disable_scheduler_mac.sh
 ```
 
 ## Security Notes

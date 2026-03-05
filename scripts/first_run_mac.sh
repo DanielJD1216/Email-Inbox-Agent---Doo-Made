@@ -38,3 +38,9 @@ read -r -p "Setup complete. Run agent now? (y/n) " RUN_NOW
 if [[ "$RUN_NOW" =~ ^([yY]|yes|YES)$ ]]; then
   .venv/bin/python -m app.main
 fi
+
+echo
+read -r -p "Enable near-live scheduler every 2 minutes? (y/n) " ENABLE_SCHED
+if [[ "$ENABLE_SCHED" =~ ^([yY]|yes|YES)$ ]]; then
+  bash scripts/enable_scheduler_mac.sh 2
+fi

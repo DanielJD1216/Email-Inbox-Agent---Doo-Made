@@ -50,3 +50,9 @@ $runNow = Read-Host "Setup complete. Run agent now? (y/n)"
 if ($runNow -match "^(y|yes)$") {
     & .\.venv\Scripts\python.exe -m app.main
 }
+
+Write-Host ""
+$scheduleNow = Read-Host "Enable near-live scheduler every 2 minutes? (y/n)"
+if ($scheduleNow -match "^(y|yes)$") {
+    & .\scripts\enable_scheduler_windows.ps1 -EveryMinutes 2
+}
