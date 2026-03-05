@@ -142,6 +142,27 @@ OPENAI_AGENTS_DISABLE_TRACING="true"
 
 If `ollama serve` says port `11434` is already in use, Ollama is already running. Just keep it running and execute the agent.
 
+## Stress-Test Email Generator
+
+Use the included script to generate synthetic inbox emails for classification testing.
+
+```bash
+python -m scripts.send_stress_test_emails
+```
+
+Optional overrides:
+
+```bash
+python -m scripts.send_stress_test_emails --to-email "you@example.com"
+python -m scripts.send_stress_test_emails --prefix "[AI-STRESS-MYRUN]"
+```
+
+Recipient selection order:
+
+1. `--to-email`
+2. `STRESS_TEST_TO_EMAIL` (env var)
+3. Authenticated Gmail address from `users.getProfile(userId="me")`
+
 ## Existing Label Mapping
 
 Configure these in `.env` to match your Gmail labels:
@@ -203,6 +224,7 @@ Runtime:
 - `MAX_EMAILS_PER_RUN`
 - `INCLUDE_READ_INBOX_EMAILS` (`false` by default; set `true` for backfill/testing)
 - `INBOX_SUBJECT_CONTAINS` (optional subject filter; useful with include-read mode)
+- `STRESS_TEST_TO_EMAIL` (optional default recipient for `scripts.send_stress_test_emails`)
 - `CATEGORY_LABELING_ENABLED`
 - `EXCLUDE_ALREADY_LABELED` (set `false` when you intentionally want to reprocess already-labeled emails)
 

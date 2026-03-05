@@ -1,22 +1,37 @@
 from __future__ import annotations
 
+import argparse
 import base64
+import os
 from datetime import datetime, timezone
 from email.message import EmailMessage
 
 from app.gmail_client import get_gmail_service
 
 
-TO_EMAIL = "daniel.jindoo@doomade.com"
-NOW_TAG = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
-PREFIX = f"[AI-STRESS-{NOW_TAG}]"
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Send synthetic stress-test emails to your Gmail inbox.")
+    parser.add_argument(
+        "--to-email",
+        default=os.getenv("STRESS_TEST_TO_EMAIL", "").strip(),
+        help=(
+            "Recipient email. If omitted, script uses your authenticated Gmail address "
+            "(users.getProfile userId='me')."
+        ),
+    )
+    parser.add_argument(
+        "--prefix",
+        default="",
+        help="Optional subject prefix override. Default: [AI-STRESS-YYYYMMDD-HHMMSS].",
+    )
+    return parser.parse_args()
 
 
-def build_cases() -> list[dict[str, str]]:
+def build_cases(prefix: str) -> list[dict[str, str]]:
     return [
         {
             "category": "Credit Card Statement",
-            "subject": f"{PREFIX} Credit Card Statement Available - March 2026",
+            "subject": f"{prefix} Credit Card Statement Available - March 2026",
             "body": (
                 "Hello Daniel,\n\n"
                 "Your March 2026 statement is now available.\n"
@@ -29,7 +44,7 @@ def build_cases() -> list[dict[str, str]]:
         },
         {
             "category": "Spam / Phishing",
-            "subject": f"{PREFIX} Urgent: Confirm your mailbox within 30 minutes",
+            "subject": f"{prefix} Urgent: Confirm your mailbox within 30 minutes",
             "body": (
                 "Dear user,\n\n"
                 "Your mailbox will be permanently suspended unless you verify now.\n"
@@ -40,7 +55,7 @@ def build_cases() -> list[dict[str, str]]:
         },
         {
             "category": "Ecommerce",
-            "subject": f"{PREFIX} Your DooMade order DM-49382 has shipped",
+            "subject": f"{prefix} Your DooMade order DM-49382 has shipped",
             "body": (
                 "Hi Daniel,\n\n"
                 "Good news, your order DM-49382 is on the way.\n"
@@ -52,7 +67,7 @@ def build_cases() -> list[dict[str, str]]:
         },
         {
             "category": "Events & Calendar",
-            "subject": f"{PREFIX} Invite: Product Roadmap Sync (Fri 2:00 PM)",
+            "subject": f"{prefix} Invite: Product Roadmap Sync (Fri 2:00 PM)",
             "body": (
                 "Hi Daniel,\n\n"
                 "Can you confirm attendance for Product Roadmap Sync?\n"
@@ -64,7 +79,7 @@ def build_cases() -> list[dict[str, str]]:
         },
         {
             "category": "Newsletter",
-            "subject": f"{PREFIX} Weekly Growth Newsletter - 12 ideas for creators",
+            "subject": f"{prefix} Weekly Growth Newsletter - 12 ideas for creators",
             "body": (
                 "Hey Daniel,\n\n"
                 "This week:\n"
@@ -76,7 +91,7 @@ def build_cases() -> list[dict[str, str]]:
         },
         {
             "category": "Security/Admin",
-            "subject": f"{PREFIX} Security alert: New admin login from unknown device",
+            "subject": f"{prefix} Security alert: New admin login from unknown device",
             "body": (
                 "Hello,\n\n"
                 "We detected an admin login from a new device.\n"
@@ -87,7 +102,7 @@ def build_cases() -> list[dict[str, str]]:
         },
         {
             "category": "Receipts & Billing",
-            "subject": f"{PREFIX} Receipt: Payment for DooMade Pro (Invoice #8452)",
+            "subject": f"{prefix} Receipt: Payment for DooMade Pro (Invoice #8452)",
             "body": (
                 "Hi Daniel,\n\n"
                 "Thanks for your payment.\n"
@@ -100,7 +115,7 @@ def build_cases() -> list[dict[str, str]]:
         },
         {
             "category": "SaaS & Tools",
-            "subject": f"{PREFIX} [Status] API incident resolved - elevated latency",
+            "subject": f"{prefix} [Status] API incident resolved - elevated latency",
             "body": (
                 "Team,\n\n"
                 "Today's API latency incident has been resolved.\n"
@@ -112,7 +127,7 @@ def build_cases() -> list[dict[str, str]]:
         },
         {
             "category": "Sales Outreach",
-            "subject": f"{PREFIX} Quick idea to increase inbound demos by 30%",
+            "subject": f"{prefix} Quick idea to increase inbound demos by 30%",
             "body": (
                 "Hi Daniel,\n\n"
                 "I reviewed your site and found 3 funnel fixes that can improve demo conversion.\n"
@@ -122,7 +137,7 @@ def build_cases() -> list[dict[str, str]]:
         },
         {
             "category": "Professional Networking",
-            "subject": f"{PREFIX} Partnership inquiry from Acme Media",
+            "subject": f"{prefix} Partnership inquiry from Acme Media",
             "body": (
                 "Hi Daniel,\n\n"
                 "We'd like to discuss a co-marketing campaign for Q2.\n"
@@ -134,7 +149,7 @@ def build_cases() -> list[dict[str, str]]:
         },
         {
             "category": "Action Required",
-            "subject": f"{PREFIX} Action required: Sign contractor agreement by Thursday",
+            "subject": f"{prefix} Action required: Sign contractor agreement by Thursday",
             "body": (
                 "Hi Daniel,\n\n"
                 "Please review and sign the contractor agreement by Thursday EOD.\n"
@@ -144,7 +159,7 @@ def build_cases() -> list[dict[str, str]]:
         },
         {
             "category": "Travel / Calendar",
-            "subject": f"{PREFIX} Flight itinerary confirmed: YVR -> SFO (Mar 18)",
+            "subject": f"{prefix} Flight itinerary confirmed: YVR -> SFO (Mar 18)",
             "body": (
                 "Hi Daniel,\n\n"
                 "Your flight booking is confirmed.\n"
@@ -156,7 +171,7 @@ def build_cases() -> list[dict[str, str]]:
         },
         {
             "category": "SaaS Billing",
-            "subject": f"{PREFIX} Renewal reminder: Figma Professional annual plan",
+            "subject": f"{prefix} Renewal reminder: Figma Professional annual plan",
             "body": (
                 "Hello Daniel,\n\n"
                 "Your annual Figma Professional subscription renews in 5 days.\n"
@@ -167,7 +182,7 @@ def build_cases() -> list[dict[str, str]]:
         },
         {
             "category": "Customer Support",
-            "subject": f"{PREFIX} Customer issue: Cannot download invoice PDF",
+            "subject": f"{prefix} Customer issue: Cannot download invoice PDF",
             "body": (
                 "Hi Daniel,\n\n"
                 "A customer reports invoice downloads failing with a 500 error.\n"
@@ -178,7 +193,7 @@ def build_cases() -> list[dict[str, str]]:
         },
         {
             "category": "Security / Spear-Phish",
-            "subject": f"{PREFIX} Urgent payroll update required before cutoff",
+            "subject": f"{prefix} Urgent payroll update required before cutoff",
             "body": (
                 "Daniel,\n\n"
                 "Payroll processing is blocked. Please send your updated banking info now\n"
@@ -190,9 +205,23 @@ def build_cases() -> list[dict[str, str]]:
     ]
 
 
-def send_case(service, case: dict[str, str]) -> str:
+def resolve_recipient_email(service, explicit_to_email: str) -> str:
+    if explicit_to_email and explicit_to_email.strip():
+        return explicit_to_email.strip()
+
+    profile = service.users().getProfile(userId="me").execute()
+    to_email = str(profile.get("emailAddress", "")).strip()
+    if not to_email:
+        raise RuntimeError(
+            "Could not resolve authenticated Gmail address. "
+            "Pass --to-email or set STRESS_TEST_TO_EMAIL."
+        )
+    return to_email
+
+
+def send_case(service, case: dict[str, str], to_email: str) -> str:
     msg = EmailMessage()
-    msg["To"] = TO_EMAIL
+    msg["To"] = to_email
     msg["Subject"] = case["subject"]
     msg.set_content(case["body"])
 
@@ -202,22 +231,25 @@ def send_case(service, case: dict[str, str]) -> str:
 
 
 def main() -> None:
+    args = parse_args()
     service = get_gmail_service()
-    cases = build_cases()
-    print(f"Sending {len(cases)} stress-test emails to {TO_EMAIL} ...")
+    now_tag = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    prefix = args.prefix.strip() if args.prefix.strip() else f"[AI-STRESS-{now_tag}]"
+    to_email = resolve_recipient_email(service, args.to_email)
+    cases = build_cases(prefix)
+    print(f"Sending {len(cases)} stress-test emails to {to_email} ...")
 
     sent_ids: list[str] = []
     for index, case in enumerate(cases, start=1):
-        message_id = send_case(service, case)
+        message_id = send_case(service, case, to_email)
         sent_ids.append(message_id)
         print(
             f"{index:02d}. [{case['category']}] sent | "
             f"subject={case['subject']} | message_id={message_id}"
         )
 
-    print(f"Done. Sent {len(sent_ids)} emails with prefix {PREFIX}")
+    print(f"Done. Sent {len(sent_ids)} emails with prefix {prefix}")
 
 
 if __name__ == "__main__":
     main()
-
